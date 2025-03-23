@@ -1,0 +1,106 @@
+import math
+
+def parse_line(line):
+    parts = line.strip().split()
+    shape_name = parts[0]
+    parameters = list(map(float, parts[1:]))
+    return shape_name, parameters
+
+class Shape:
+    def perimeter(self):
+        raise NotImplementedError
+    
+    def area(self):
+        raise NotImplementedError
+
+class Triangle(Shape):
+    def __init__(self, a, b, c):
+        self.a, self.b, self.c = a, b, c
+    
+    def perimeter(self):
+        return self.a + self.b + self.c
+    
+    def area(self):
+        s = self.perimeter() / 2
+        return math.sqrt(s * (s - self.a) * (s - self.b) * (s - self.c))
+
+class Rectangle(Shape):
+    def __init__(self, a, b):
+        self.a, self.b = a, b
+    
+    def perimeter(self):
+        return 2 * (self.a + self.b)
+    
+    def area(self):
+        return self.a * self.b
+
+class Trapeze(Shape):
+    def __init__(self, a, b, c, d):
+        self.a, self.b, self.c, self.d = a, b, c, d
+    
+    def perimeter(self):
+        return self.a + self.b + self.c + self.d
+    
+    def area(self):
+        s = (self.a + self.b + self.c + self.d) / 2
+        return (self.a + self.b) / 2 * math.sqrt(
+            (s - self.a) * (s - self.b) * (s - self.a - self.c) * (s - self.a - self.d)
+        )
+
+class Parallelogram(Shape):
+    def __init__(self, a, b, h):
+        self.a, self.b, self.h = a, b, h
+    
+    def perimeter(self):
+        return 2 * (self.a + self.b)
+    
+    def area(self):
+        return self.a * self.h
+
+class Circle(Shape):
+    def __init__(self, r):
+        self.r = r
+    
+    def perimeter(self):
+        return 2 * math.pi * self.r
+    
+    def area(self):
+        return math.pi * self.r ** 2
+
+def read_shapes_from_file(filename):
+    shapes = []
+    with open(filename, 'r') as file:
+        for line in file:
+            shape_name, params = parse_line(line)
+            if shape_name == "Triangle":
+                shapes.append(Triangle(*params))
+            elif shape_name == "Rectangle":
+                shapes.append(Rectangle(*params))
+            elif shape_name == "Trapeze":
+                shapes.append(Trapeze(*params))
+            elif shape_name == "Parallelogram":
+                shapes.append(Parallelogram(*params))
+            elif shape_name == "Circle":
+                shapes.append(Circle(*params))
+    return shapes
+
+def find_largest_shapes(shapes):
+    max_area_shape = max(shapes, key=lambda s: s.area())
+    max_perimeter_shape = max(shapes, key=lambda s: s.perimeter())
+    return max_area_shape, max_perimeter_shape
+
+def main():
+    input_files = ["input01.txt", "input02.txt", "input03.txt"]
+    output_filename = "output.txt"
+    
+    with open(output_filename, "w") as output_file:
+        for input_file in input_files:
+            shapes = read_shapes_from_file(input_file)
+            max_area_shape, max_perimeter_shape = find_largest_shapes(shapes)
+            
+            output_file.write(f"File: {input_file}\n")
+            output_file.write(f"Shape with max area: {type(max_area_shape).__name__}, Area: {max_area_shape.area()}\n")
+            output_file.write(f"Shape with max perimeter: {type(max_perimeter_shape).__name__}, Perimeter: {max_perimeter_shape.perimeter()}\n\n")
+
+if __name__ == "__main__":
+    main()
